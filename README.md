@@ -111,6 +111,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 ## Roadmap
 
-[x] MVP#1 : Build a cli to encrypt and decrypt files with a secret key from harcoded value
-[x] MVP#2 : Use environment variable to get secret key.
-[ ] MVP#3 : Add Bitwarden as an external secret provider
+- [x] MVP#1 : Build a cli to encrypt and decrypt files with a secret key from harcoded value
+- [x] MVP#2 : Use environment variable to get secret key.
+- [ ] MVP#3 : Encrypt all files within a directory (with or without recursive mode)
