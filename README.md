@@ -114,5 +114,5 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 - [x] MVP#1 : Build a cli to encrypt and decrypt files with a secret key from harcoded value
 - [x] MVP#2 : Use environment variable to get secret key.
 - [x] MVP#3 : Use file to get secret key
-- [ ] MVP#4 : Add unit tests
-- [ ] MVP#5 : Encrypt all files within a directory (with or without recursive mode)
+- [x] MVP#4 : Encrypt all files within a directory (with or without recursive mode)
+- [ ] MVP#5 : Add unit tests
