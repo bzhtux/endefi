@@ -49,6 +49,8 @@ Get more details at github.com/bzhtux/endefi'
 }
 
 var filePath string
+var dirPath string
+var recursive bool
 var cfg *config.Config
 var service endefi.SecretService
 
@@ -76,6 +78,7 @@ func init() {
 	// will be global for your application.
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.endefi.yaml)")
+	rootCmd.PersistentFlags().BoolVarP(&recursive, "recursive", "r", false, "Encrypt or Decrypt all files recursively within a directory")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
