@@ -36,37 +36,43 @@ var decryptCmd = &cobra.Command{
 	Short: "Decrypt a local file",
 	Long:  `Decrypt a local file using aes GCM.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Default().Printf("Decrypt a new file: %s", filePath)
-		info, err := os.Lstat(filePath)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
+		if dirPath != "" {
+			if recursive {
+				log.Default().Printf("Decrypt all files recursively within %s", dirPath)
+				files, err := endefi.WalkDir(dirPath)
+				if err != nil {
+					log.Fatal(err)
+					os.Exit(1)
+				}
+				for _, filePath := range files {
+					log.Default().Printf("Decrypt a new file: %s", filePath)
+					if err := DecryptFile(filePath); err != nil {
+						log.Fatal(err)
+						os.Exit(1)
+					}
+				}
+			} else {
+				log.Default().Printf("Decrypt a new directory: %s", dirPath)
+				files, err := endefi.ListDir(dirPath)
+				if err != nil {
+					log.Fatal(err)
+					os.Exit(1)
+				}
+				for _, filePath := range files {
+					if err := DecryptFile(filePath); err != nil {
+						log.Fatal(err)
+						os.Exit(1)
+					}
+				}
+			}
 
-		f := &endefi.File{
-			Path: filePath,
+		} else {
+			log.Default().Printf("Decrypt a new file: %s", filePath)
+			if err := DecryptFile(filePath); err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
 		}
-		f, err = endefi.NewFile(f)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-		k, err := service.GetSecretKey(cfg)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-		key, err := hex.DecodeString(k.Key)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-		decryptedData, err := endefi.DecryptData(f.Data, key)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-		os.WriteFile(filePath, decryptedData, info.Mode().Perm())
 	},
 }
 
@@ -81,8 +87,46 @@ func init() {
 	// and all subcommands, e.g.:
 	// decryptCmd.PersistentFlags().String("foo", "", "A help for foo")
 	decryptCmd.Flags().StringVarP(&filePath, "file", "f", "", "Local file to decrypt")
+	decryptCmd.Flags().StringVarP(&dirPath, "dir", "d", "", "Local directory to encrypt")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// decryptCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func DecryptFile(filePath string) error {
+	info, err := os.Lstat(filePath)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	f := &endefi.File{
+		Path: filePath,
+	}
+	f, err = endefi.NewFile(f)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	k, err := service.GetSecretKey(cfg)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	key, err := hex.DecodeString(k.Key)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	decryptedData, err := endefi.DecryptData(f.Data, key)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	if err := os.WriteFile(filePath, decryptedData, info.Mode().Perm()); err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
 }
