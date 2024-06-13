@@ -67,7 +67,7 @@ key: ce8f829cc257b910ac11cf9fe57f3ea4d2811ff06b3b47e8f41149be56f234b7
 provider: local
 ```
 
-## Example
+## Examples
 
 I assume you already run the requirement above. First let's use a text file `/tmp/lorem.txt`:
 
@@ -75,6 +75,8 @@ I assume you already run the requirement above. First let's use a text file `/tm
 cat /tmp/lorem.txt
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 ```
+
+### File
 
 Run endefi to encrypt this file:
 
@@ -107,6 +109,107 @@ Verify `lorem.txt` is now a plain text file:
 ```shell
 cat /tmp/lorem.txt
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+```
+
+### Directory
+
+Let's create the following tree:
+
+```shell
+/tmp/demo/
+├── dir1
+│   ├── file11
+│   └── file12
+├── dir2
+│   ├── file21
+│   └── file22
+├── file1
+└── file2
+```
+
+Each file content its own name:
+
+```shell
+cat /tmp/demo/file1
+file1
+cat /tmp/demo/dir2/file21
+file21
+```
+
+Let's encrypt `/tmp/demo` without recursive mode:
+
+```shell
+endefi encrypt -d /tmp/demo
+2024/06/13 09:50:11 Starting EnDeFi
+2024/06/13 09:50:11 Encrypt a new directory: /tmp/demo
+2024/06/13 09:50:11 Encrypt a new file: /tmp/demo/file1
+2024/06/13 09:50:11 Encrypt a new file: /tmp/demo/file2
+```
+
+Let's check `/tmp/demo/file1` content:
+
+```shell
+cat /tmp/demo/file1
+4@9)�Zt3#O@�DZDzHA�*% 
+```
+
+Decrypt `/tmp/demo`:
+
+```shell
+endefi decrypt -d /tmp/demo
+2024/06/13 09:51:26 Starting EnDeFi
+2024/06/13 09:51:26 Decrypt a new directory: /tmp/demo
+2024/06/13 09:51:26 Decrypt a new file: /tmp/demo/file1
+2024/06/13 09:51:26 Decrypt a new file: /tmp/demo/file2
+```
+
+Verify:
+
+```shell
+cat /tmp/demo/file1
+file1
+```
+
+Let's encrypt `/tmp/demo` with recursive mode:
+
+```shell
+endefi encrypt -d /tmp/demo -r
+2024/06/13 08:43:40 Starting EnDeFi
+2024/06/13 08:43:40 Encrypt all files recursively within /tmp/demo
+2024/06/13 08:43:40 Encrypt a new file: /tmp/demo/dir1/file11
+2024/06/13 08:43:40 Encrypt a new file: /tmp/demo/dir1/file12
+2024/06/13 08:43:40 Encrypt a new file: /tmp/demo/dir2/file21
+2024/06/13 08:43:40 Encrypt a new file: /tmp/demo/dir2/file22
+2024/06/13 08:43:40 Encrypt a new file: /tmp/demo/file1
+2024/06/13 08:43:40 Encrypt a new file: /tmp/demo/file2
+```
+
+Verify:
+
+```shell
+cat  /tmp/demo/dir2/file22
+2εwY0�׊ ���bD'%  
+```
+
+Decrypt `/tmp/demo`:
+
+```shell
+endefi decrypt -d /tmp/demo -r
+2024/06/13 08:44:42 Starting EnDeFi
+2024/06/13 08:44:42 Decrypt all files recursively within /tmp/demo
+2024/06/13 08:44:42 Decrypt a new file: /tmp/demo/dir1/file11
+2024/06/13 08:44:42 Decrypt a new file: /tmp/demo/dir1/file12
+2024/06/13 08:44:42 Decrypt a new file: /tmp/demo/dir2/file21
+2024/06/13 08:44:42 Decrypt a new file: /tmp/demo/dir2/file22
+2024/06/13 08:44:42 Decrypt a new file: /tmp/demo/file1
+2024/06/13 08:44:42 Decrypt a new file: /tmp/demo/file2
+```
+
+Verify:
+
+```shell
+cat  /tmp/demo/dir2/file22
+file22
 ```
 
 ## Roadmap
