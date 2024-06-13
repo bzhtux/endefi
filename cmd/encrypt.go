@@ -38,6 +38,7 @@ var encryptCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if dirPath != "" {
+			log.Default().Printf("Encrypt a new directory: %s", dirPath)
 			if recursive {
 				log.Default().Printf("Encrypt all files recursively within %s", dirPath)
 				files, err := endefi.WalkDir(dirPath)
@@ -53,7 +54,6 @@ var encryptCmd = &cobra.Command{
 					}
 				}
 			} else {
-				log.Default().Printf("Encrypt a new directory: %s", dirPath)
 				files, err := endefi.ListDir(dirPath)
 				if err != nil {
 					log.Fatal(err)
@@ -64,6 +64,7 @@ var encryptCmd = &cobra.Command{
 						log.Fatal(err)
 						os.Exit(1)
 					}
+					log.Default().Printf("Encrypt a new file: %s", filePath)
 				}
 			}
 		} else {

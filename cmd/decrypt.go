@@ -37,6 +37,7 @@ var decryptCmd = &cobra.Command{
 	Long:  `Decrypt a local file using aes GCM.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if dirPath != "" {
+			log.Default().Printf("Decrypt a new directory: %s", dirPath)
 			if recursive {
 				log.Default().Printf("Decrypt all files recursively within %s", dirPath)
 				files, err := endefi.WalkDir(dirPath)
@@ -45,14 +46,13 @@ var decryptCmd = &cobra.Command{
 					os.Exit(1)
 				}
 				for _, filePath := range files {
-					log.Default().Printf("Decrypt a new file: %s", filePath)
 					if err := DecryptFile(filePath); err != nil {
 						log.Fatal(err)
 						os.Exit(1)
 					}
+					log.Default().Printf("Decrypt a new file: %s", filePath)
 				}
 			} else {
-				log.Default().Printf("Decrypt a new directory: %s", dirPath)
 				files, err := endefi.ListDir(dirPath)
 				if err != nil {
 					log.Fatal(err)
@@ -63,6 +63,7 @@ var decryptCmd = &cobra.Command{
 						log.Fatal(err)
 						os.Exit(1)
 					}
+					log.Default().Printf("Decrypt a new file: %s", filePath)
 				}
 			}
 
