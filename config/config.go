@@ -22,6 +22,7 @@ THE SOFTWARE.
 package config
 
 import (
+	"errors"
 	"log"
 	"os"
 
@@ -56,8 +57,7 @@ type SecretConfig struct {
 func setAppDefault() *AppConfig {
 	// set default config
 	return &AppConfig{
-		Name:     "EnDeFi",
-		Provider: "env",
+		Name: "EnDeFi",
 	}
 }
 
@@ -68,73 +68,70 @@ func setSecretDefault() *SecretConfig {
 		log.Fatal(err)
 	}
 	return &SecretConfig{
-		Name: "env",
 		File: homedir + "/.endefi/secret.yaml",
 	}
 }
 
-func NewAppConfig() *AppConfig {
+func NewAppConfig() (*AppConfig, error) {
 	ac := setAppDefault()
+	if eap := os.Getenv(ENV_PREFIX + "_SECRET_PROVIDER"); eap != "" {
+		ac.Provider = eap
+	} else {
+		return nil, errors.New("no secret provider found via environment variable")
+	}
 	if ean := os.Getenv(ENV_PREFIX + "_APP_NAME"); ean != "" {
 		ac.Name = ean
 	}
-	if eap := os.Getenv(ENV_PREFIX + "_SECRET_PROVIDER"); eap != "" {
-		ac.Provider = eap
-	}
-	return ac
+	return ac, nil
 }
 
-func NewSecretConfig() *SecretConfig {
+func NewSecretConfig() (*SecretConfig, error) {
 	sc := setSecretDefault()
 	switch os.Getenv(ENV_PREFIX + "_SECRET_PROVIDER") {
 	case "env":
 		if esk := os.Getenv(ENV_PREFIX + "_SECRET_KEY"); esk != "" {
 			sc.Key = esk
+			sc.Name = "env"
+			return sc, nil
+		} else {
+			return nil, errors.New("no secret key found via environment variable")
 		}
-		return sc
-	case "bitwarden":
-		// Do something
-		// if esn := os.Getenv(ENV_PREFIX + "_SECRET_NAME"); esn != "" {
-		// 	sc.Name = esn
-		// }
-
-		// if esp := os.Getenv(ENV_PREFIX + "_SECRET_PROVIDER"); esp != "" {
-		// 	sc.Provider = esp
-		// }
-		// if esci := os.Getenv(ENV_PREFIX + "_SECRET_CLIENT_ID"); esci != "" {
-		// 	sc.ClientID = esci
-		// }
-		// if escs := os.Getenv(ENV_PREFIX + "_SECRET_CLIENT_SECRET"); escs != "" {
-		// 	sc.ClientSecret = escs
-		// }
-		// if esurl := os.Getenv(ENV_PREFIX + "_SECRET_URL"); esurl != "" {
-		// 	sc.URL = esurl
-		// }
-		// if esu := os.Getenv(ENV_PREFIX + "_SECRET_USERNAME"); esu != "" {
-		// 	sc.Username = esu
-		// }
-		// if espwd := os.Getenv(ENV_PREFIX + "_SECRET_PASSWORD"); espwd != "" {
-		// 	sc.Password = espwd
-		// }
-		return sc
 	case "local":
 		if esf := os.Getenv(ENV_PREFIX + "_SECRET_FILE"); esf != "" {
 			sc.File = esf
+			sc.Name = "local"
 		}
-		return sc
+		return sc, nil
 	default:
-		log.Fatal("No secret provider found, exiting ...")
-		os.Exit(1)
+		return nil, errors.New("no secret provider found via environment variable")
 	}
-
-	return sc
 }
 
-func NewConfig() *Config {
-	ac := NewAppConfig()
-	sc := NewSecretConfig()
+func fileExists(file string) bool {
+	info, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		return false
+	}
+	if info.IsDir() {
+		return false
+	}
+	return true
+}
+
+func NewConfig() (*Config, error) {
+	ac, err := NewAppConfig()
+	if err != nil {
+		return nil, err
+	}
+	sc, err := NewSecretConfig()
+	if err != nil {
+		return nil, err
+	}
+	if !fileExists(sc.File) {
+		return nil, errors.New("secret file not found")
+	}
 	return &Config{
 		App:    ac,
 		Secret: sc,
-	}
+	}, nil
 }
