@@ -37,11 +37,14 @@ var _ = ginkgo.Describe("Config", func() {
 		})
 		ginkgo.Context("With Env Var", func() {
 			ginkgo.It("config.NewConfig should not exit with err", func() {
-				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "local")
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_KEY")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "env")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_KEY", "my secret test key")
 				cfg, err := config.NewConfig()
 				gomega.Expect(err).To(gomega.BeNil())
 				gomega.Expect(cfg).NotTo(gomega.BeNil())
-				gomega.Expect(cfg.App.Provider).To(gomega.Equal("local"))
+				gomega.Expect(cfg.App.Provider).To(gomega.Equal("env"))
 			})
 		})
 		ginkgo.Context("With Unexpected Env Var (secret provider set to 'test')", func() {
