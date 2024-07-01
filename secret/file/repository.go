@@ -41,7 +41,10 @@ func NewFileRepository(cfg config.Config) endefi.SecretRepository {
 }
 
 func (r *FileRepository) GetSecretKey(cfg *config.Config) (*endefi.Secret, error) {
-	sk := config.NewSecretConfig()
+	sk, err := config.NewSecretConfig()
+	if err != nil {
+		return nil, err
+	}
 	type cfgYML struct {
 		Key      string `yaml:"key"`
 		Provider string `yaml:"provider"`

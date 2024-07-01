@@ -37,7 +37,10 @@ func NewEnvRepository(cfg config.Config) endefi.SecretRepository {
 }
 
 func (r *EnvRepository) GetSecretKey(cfg *config.Config) (*endefi.Secret, error) {
-	sk := config.NewSecretConfig()
+	sk, err := config.NewSecretConfig()
+	if err != nil {
+		return nil, err
+	}
 	return &endefi.Secret{
 		Key:      sk.Key,
 		Provider: "env",
