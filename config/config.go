@@ -92,6 +92,7 @@ func NewSecretConfig() (*SecretConfig, error) {
 		if esk := os.Getenv(ENV_PREFIX + "_SECRET_KEY"); esk != "" {
 			sc.Key = esk
 			sc.Name = "env"
+			sc.File = ""
 			return sc, nil
 		} else {
 			return nil, errors.New("no secret key found via environment variable")
