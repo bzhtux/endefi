@@ -92,6 +92,7 @@ func NewSecretConfig() (*SecretConfig, error) {
 		if esk := os.Getenv(ENV_PREFIX + "_SECRET_KEY"); esk != "" {
 			sc.Key = esk
 			sc.Name = "env"
+			sc.File = ""
 			return sc, nil
 		} else {
 			return nil, errors.New("no secret key found via environment variable")
@@ -127,7 +128,7 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !fileExists(sc.File) {
+	if ac.Provider == "local" && !fileExists(sc.File) {
 		return nil, errors.New("secret file not found")
 	}
 	return &Config{
