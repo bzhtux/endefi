@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/github/bzhtux/endefi/graph/badge.svg?token=o1qcG7cV9A)](https://codecov.io/github/bzhtux/endefi)
+
 # EnDeFi
 
 Encrypt Decrypt Files
