@@ -66,9 +66,13 @@ func Execute() {
 }
 
 func init() {
-	cfg = config.NewConfig()
+	cfg, err := config.NewConfig()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 	// fmt.Printf("cfg: %v\n", cfg.App.Provider)
-	repo := selectSecretRepo(cfg)
+	repo := SelectSecretRepo(cfg)
 	service = endefi.NewSecretService(repo)
 
 	log.Default().Printf("Starting %s", cfg.App.Name)
@@ -85,7 +89,7 @@ func init() {
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func selectSecretRepo(cfg *config.Config) endefi.SecretRepository {
+func SelectSecretRepo(cfg *config.Config) endefi.SecretRepository {
 	switch cfg.App.Provider {
 	case "env":
 		// repo = env.NewEnvRepository(cfg.Secret)
