@@ -1,0 +1,52 @@
+
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+on:
+  push:
+    branches:
+        - "*"
+    tags:
+      - v*
+  pull_request:
+    branches: ["release", "main"]
+
+permissions:
+  contents: read
+
+jobs:
+  mod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - uses: actions/checkout@v4
+      - run: go mod tidy && git diff --exit-code go.mod go.sum
+  test:
+    needs: mod
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['1.21','1.22']
+    name: Go ${{ matrix.version }}
+    steps:
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.version }}
+    - name: Checkout source code
+      uses: actions/checkout@v4
+    - name: Install Ginkgo
+      run: go install github.com/onsi/ginkgo/v2/ginkgo
+    - name: Install Gomega
+      run: go get github.com/onsi/gomega/...
+    - name: Run go vet
+      run: go vet ./...
+    - name: Run tests
+      run: ginkgo -r -p --randomize-all --randomize-suites  --race --keep-going --timeout 60s -coverprofile=coverage.out -covermode=atomic --succinct ./...
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

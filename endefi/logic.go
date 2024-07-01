@@ -25,8 +25,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/base64"
-	"encoding/hex"
 	"io"
 
 	"log"
@@ -49,16 +47,17 @@ func NewSecretService(secretRepo SecretRepository) SecretService {
 }
 
 // CheckKeySize check the key size.
-func checkKeySize(keyString []byte) error {
+// Key size should be 8/16/32 bytes length otherwise function will throw an error
+func CheckKeySize(keyString []byte) error {
 	_, err := aes.NewCipher(keyString)
 	if err != nil {
-		log.Default().Printf("Error: %s", err.Error())
+		// log.Default().Printf("Error: %s", err.Error())
 		return err
 	}
 	return nil
 }
 
-// GenerateRandomKey generate a random key
+// GenerateRandomKey generate a random 32 bit key
 func GenerateRandomKey() ([]byte, error) {
 	key := make([]byte, 32)
 	if _, err := rand.Read(key); err != nil {
@@ -67,43 +66,9 @@ func GenerateRandomKey() ([]byte, error) {
 	return key, nil
 }
 
-// ConvertByteToString convert an array of byte to a string
-func ConvertByteToString(b []byte) string {
-	keyStr := hex.EncodeToString(b)
-
-	return keyStr
-}
-
-// ConvertStringToByte convert a string to an array of byte
-func ConvertStringToByte(s string) ([]byte, error) {
-	b, err := hex.DecodeString(s)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
-}
-
-// B64Encode encode a string into base64
-func B64Encode(s string) string {
-	b64 := base64.URLEncoding.EncodeToString([]byte(s))
-
-	return b64
-}
-
-// B64Decode decode a base64 string into an array of byte
-func B64Decode(s string) ([]byte, error) {
-	b, err := base64.URLEncoding.DecodeString(s)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
 // EncryptData encrypt data using aes GCM
 func EncryptData(plaindata string, key []byte) ([]byte, error) {
-	if err := checkKeySize(key); err != nil {
+	if err := CheckKeySize(key); err != nil {
 		return nil, err
 	}
 
