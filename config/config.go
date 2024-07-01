@@ -128,7 +128,7 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !fileExists(sc.File) {
+	if ac.Provider == "local" && !fileExists(sc.File) {
 		return nil, errors.New("secret file not found")
 	}
 	return &Config{
