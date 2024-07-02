@@ -51,6 +51,33 @@ var _ = ginkgo.Describe("File", func() {
 				gomega.Expect(err2).To(gomega.BeNil())
 				gomega.Expect(secret.Key).To(gomega.Equal("test"))
 			})
+			ginkgo.It("with non existing file should return an error", func() {
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "local")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_FILE", "/endefi-test")
+				// _, err1 := config.NewConfig()
+				// gomega.Expect(err1).NotTo(gomega.BeNil())
+				ac := config.AppConfig{
+					Provider: "local",
+				}
+				sc := config.SecretConfig{
+					File: "/endefi-test",
+				}
+				// c := config.Config{
+				// 	App:    &ac,
+				// 	Secret: &sc,
+				// }
+				repo := file.NewFileRepository(config.Config{
+					App:    &ac,
+					Secret: &sc,
+				})
+				secret, err2 := repo.GetSecretKey(&config.Config{
+					App:    &ac,
+					Secret: &sc,
+				})
+				gomega.Expect(err2).NotTo(gomega.BeNil())
+				gomega.Expect(secret).To(gomega.BeNil())
+			})
 		})
 	})
 })

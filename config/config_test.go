@@ -7,7 +7,7 @@ import (
 	"github.com/onsi/gomega"
 
 	"github.com/bzhtux/endefi/config"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type NeverExits struct{}
@@ -25,7 +25,7 @@ var _ = ginkgo.Describe("Config", func() {
 	// var cfg *config.Config
 
 	ginkgo.Describe("Test Config Provider", func() {
-		ginkgo.Context("Without Env Var", func() {
+		ginkgo.Context("Without correct Env Var", func() {
 			ginkgo.It("config.NewConfig should exit with err", func() {
 				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
 				os.Unsetenv(config.ENV_PREFIX + "_SECRET_KEY")
