@@ -220,4 +220,6 @@ file22
 - [x] MVP#2 : Use environment variable to get secret key.
 - [x] MVP#3 : Use file to get secret key
 - [x] MVP#4 : Encrypt all files within a directory (with or without recursive mode)
-- [ ] MVP#5 : Add unit tests
+- [x] MVP#5 : Add unit tests
+- [ ] MVP#6 : crypt secret file with password
+- [ ] Study with external secret provider could be use to store secret
