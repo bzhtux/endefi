@@ -1,3 +1,4 @@
+[![CI](https://github.com/bzhtux/endefi/actions/workflows/ci.yml/badge.svg)](https://github.com/bzhtux/endefi/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/github/bzhtux/endefi/graph/badge.svg?token=o1qcG7cV9A)](https://codecov.io/github/bzhtux/endefi)
 
 # EnDeFi
@@ -221,5 +222,6 @@ file22
 - [x] MVP#3 : Use file to get secret key
 - [x] MVP#4 : Encrypt all files within a directory (with or without recursive mode)
 - [x] MVP#5 : Add unit tests
-- [ ] MVP#6 : crypt secret file with password
-- [ ] Study with external secret provider could be use to store secret
+- [ ] MVP#6 : Add init to create a local secret file
+- [ ] MVP#7 : crypt file with password and apply to local secret file
+- [ ] MVP#8 : make local secret the default provider (rely on MVP#7)
