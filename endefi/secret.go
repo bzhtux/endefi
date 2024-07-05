@@ -64,25 +64,19 @@ func EncryptSecretFile(source string, password []byte) error {
 
 	// Randomizing the nonce
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		// @codeCoverageIgnoreStart
-		panic(err.Error())
-		// @codeCoverageIgnoreEnd
+		return err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		// @codeCoverageIgnoreStart
-		panic(err.Error())
-		// @codeCoverageIgnoreEnd
+		return err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		// @codeCoverageIgnoreStart
-		panic(err.Error())
-		// @codeCoverageIgnoreEnd
+		return err
 	}
 
 	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
@@ -90,16 +84,12 @@ func EncryptSecretFile(source string, password []byte) error {
 	ciphertext = append(ciphertext, nonce...)
 	f, err := os.Create(source)
 	if err != nil {
-		// @codeCoverageIgnoreStart
-		panic(err.Error())
-		// @codeCoverageIgnoreEnd
+		return err
 	}
 
 	_, err = io.Copy(f, bytes.NewReader(ciphertext))
 	if err != nil {
-		// @codeCoverageIgnoreStart
-		panic(err.Error())
-		// @codeCoverageIgnoreEnd
+		return err
 	}
 
 	return nil
