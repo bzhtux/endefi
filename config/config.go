@@ -57,7 +57,8 @@ type SecretConfig struct {
 func setAppDefault() *AppConfig {
 	// set default config
 	return &AppConfig{
-		Name: "EnDeFi",
+		Name:     "EnDeFi",
+		Provider: "local",
 	}
 }
 
@@ -108,7 +109,7 @@ func NewSecretConfig() (*SecretConfig, error) {
 	}
 }
 
-func fileExists(file string) bool {
+func FileExists(file string) bool {
 	info, err := os.Stat(file)
 	if os.IsNotExist(err) {
 		return false
@@ -127,9 +128,6 @@ func NewConfig() (*Config, error) {
 	sc, err := NewSecretConfig()
 	if err != nil {
 		return nil, err
-	}
-	if ac.Provider == "local" && !fileExists(sc.File) {
-		return nil, errors.New("secret file not found")
 	}
 	return &Config{
 		App:    ac,

@@ -62,8 +62,10 @@ var _ = ginkgo.Describe("Config", func() {
 				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "local")
 				os.Setenv(config.ENV_PREFIX+"_SECRET_FILE", "/tmp/test.yaml")
 				cfg, err := config.NewConfig()
-				gomega.Expect(err).NotTo(gomega.BeNil())
-				gomega.Expect(cfg).To(gomega.BeNil())
+				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(cfg).NotTo(gomega.BeNil())
+				f_exists := config.FileExists(cfg.Secret.File)
+				gomega.Expect(f_exists).To(gomega.BeFalse())
 			})
 		})
 		ginkgo.Context("With env var and with an existing secret file", func() {
