@@ -8,6 +8,7 @@ import (
 
 	"github.com/bzhtux/endefi/config"
 	"github.com/bzhtux/endefi/endefi"
+	"github.com/bzhtux/endefi/secret/env"
 )
 
 type testSecretFile struct {
@@ -129,6 +130,35 @@ var _ = ginkgo.Describe("Endefi", func() {
 		})
 	})
 	ginkgo.Describe("Test Endefi Logic", func() {
+		ginkgo.Context("Test NewSecretService", func() {
+			ginkgo.It("should create a new secret service without error", func() {
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_FILE")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "env")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_KEY", "my secret test key")
+				cfg, err := config.NewConfig()
+				gomega.Expect(err).To(gomega.BeNil())
+				repo := env.NewEnvRepository(*cfg)
+				ss := endefi.NewSecretService(repo)
+				gomega.Expect(ss).NotTo(gomega.BeNil())
+			})
+		})
+		ginkgo.Context("Test GetSecretKey", func() {
+			ginkgo.It("should call getsecret without error", func() {
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_FILE")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "env")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_KEY", "my secret test key")
+				cfg, err := config.NewConfig()
+				gomega.Expect(err).To(gomega.BeNil())
+				repo := env.NewEnvRepository(*cfg)
+				ss := endefi.NewSecretService(repo)
+				gomega.Expect(ss).NotTo(gomega.BeNil())
+				secret, err := ss.GetSecretKey(cfg)
+				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(secret.Key).To(gomega.Equal("my secret test key"))
+			})
+		})
 		ginkgo.Context("Test GenerateRandomKey", func() {
 			ginkgo.It("should generate a random key without error", func() {
 				_, err := endefi.GenerateRandomKey()
