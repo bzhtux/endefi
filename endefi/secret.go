@@ -96,6 +96,6 @@ func EncryptSecretFile(source string, password []byte) error {
 	return nil
 }
 
-func DecryptSecretFile() {
+// func DecryptSecretFile() {
 
-}
+// }

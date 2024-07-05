@@ -252,8 +252,11 @@ var _ = ginkgo.Describe("Endefi", func() {
 				f, err := os.CreateTemp(d, "secret.fake")
 				gomega.Expect(err).To(gomega.BeNil())
 				os.Setenv(config.ENV_PREFIX+"_SECRET_FILE", f.Name())
-				err = endefi.EncryptSecretFile(f.Name(), []byte("\\❤️\n"))
-				gomega.Expect(err).To(gomega.BeNil())
+				e := endefi.EncryptSecretFile(f.Name(), []byte("\t\\e\\s\t\\e\n\\"))
+				gomega.Expect(e).To(gomega.BeNil())
+				// gomega.Expect(func() {
+				// 	endefi.EncryptSecretFile(f.Name(), []byte("\t\\e\\s\t\\e\n\\"))
+				// }).To(gomega.Panic())
 			})
 		})
 	})
