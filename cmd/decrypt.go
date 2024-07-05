@@ -26,6 +26,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/bzhtux/endefi/config"
 	"github.com/bzhtux/endefi/endefi"
 	"github.com/spf13/cobra"
 )
@@ -36,6 +37,12 @@ var decryptCmd = &cobra.Command{
 	Short: "Decrypt a local file",
 	Long:  `Decrypt a local file using aes GCM.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if cfg.App.Provider == "local" {
+			if cfg.Secret.File != "" && !config.FileExists(cfg.Secret.File) {
+				log.Fatal("File not found: ", cfg.Secret.File)
+				os.Exit(1)
+			}
+		}
 		if dirPath != "" {
 			log.Default().Printf("Decrypt a new directory: %s", dirPath)
 			if recursive {
