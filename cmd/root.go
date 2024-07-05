@@ -71,7 +71,12 @@ func init() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-	// fmt.Printf("cfg: %v\n", cfg.App.Provider)
+	// if cfg.App.Provider == "local" {
+	// 	if cfg.Secret.File != "" && !config.FileExists(cfg.Secret.File) {
+	// 		log.Fatal("File not found: ", cfg.Secret.File)
+	// 		os.Exit(1)
+	// 	}
+	// }
 	repo := SelectSecretRepo(cfg)
 	service = endefi.NewSecretService(repo)
 
