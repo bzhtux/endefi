@@ -63,46 +63,44 @@ func EncryptSecretFile(source string, password []byte) error {
 	nonce := make([]byte, 12)
 
 	// Randomizing the nonce
-	// @codeCoverageIgnoreStart
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		// @codeCoverageIgnoreStart
 		panic(err.Error())
+		// @codeCoverageIgnoreEnd
 	}
-	// @codeCoverageIgnoreEnd
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
 
-	// @codeCoverageIgnoreStart
 	block, err := aes.NewCipher(dk)
 	if err != nil {
+		// @codeCoverageIgnoreStart
 		panic(err.Error())
+		// @codeCoverageIgnoreEnd
 	}
-	// @codeCoverageIgnoreEnd
 
-	// @codeCoverageIgnoreStart
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
+		// @codeCoverageIgnoreStart
 		panic(err.Error())
+		// @codeCoverageIgnoreEnd
 	}
-	// @codeCoverageIgnoreEnd
 
 	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
-
 	// Append the nonce to the end of file
 	ciphertext = append(ciphertext, nonce...)
-
-	// @codeCoverageIgnoreStart
 	f, err := os.Create(source)
 	if err != nil {
+		// @codeCoverageIgnoreStart
 		panic(err.Error())
+		// @codeCoverageIgnoreEnd
 	}
-	// @codeCoverageIgnoreEnd
 
-	// @codeCoverageIgnoreStart
 	_, err = io.Copy(f, bytes.NewReader(ciphertext))
 	if err != nil {
+		// @codeCoverageIgnoreStart
 		panic(err.Error())
+		// @codeCoverageIgnoreEnd
 	}
-	// @codeCoverageIgnoreEnd
 
 	return nil
 }
