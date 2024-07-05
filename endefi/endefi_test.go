@@ -6,8 +6,14 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
+	"github.com/bzhtux/endefi/config"
 	"github.com/bzhtux/endefi/endefi"
 )
+
+type testSecretFile struct {
+	key      string
+	provider string
+}
 
 var _ = ginkgo.Describe("Endefi", func() {
 	ginkgo.Describe("Test Endefi File", func() {
@@ -194,6 +200,32 @@ var _ = ginkgo.Describe("Endefi", func() {
 				gomega.Expect(err3).To(gomega.BeNil())
 				_, err4 := endefi.DecryptData(encrypted, new_key2)
 				gomega.Expect(err4).NotTo(gomega.BeNil())
+			})
+		})
+	})
+	ginkgo.Describe("Test Endefi Secret", func() {
+		ginkgo.Context("Test Encrypt Secret file", func() {
+			ginkgo.It("With non existent file should return an error", func() {
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_FILE")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "env")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_FILE", "/tmp/.fake/secret.fake")
+				err := endefi.EncryptSecretFile(config.ENV_PREFIX+"_SECRET_FILE", []byte("test"))
+				gomega.Expect(err).NotTo(gomega.BeNil())
+			})
+			ginkgo.It("With existing file should not return an error", func() {
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_PROVIDER")
+				os.Unsetenv(config.ENV_PREFIX + "_SECRET_FILE")
+				os.Setenv(config.ENV_PREFIX+"_SECRET_PROVIDER", "env")
+				d, err := os.MkdirTemp(os.TempDir(), ".fake")
+				gomega.Expect(err).To(gomega.BeNil())
+				defer os.RemoveAll(d)
+				f, err := os.CreateTemp(d, "secret.fake")
+				// fmt.Printf("File name: %s\n", f.Name())
+				gomega.Expect(err).To(gomega.BeNil())
+				os.Setenv(config.ENV_PREFIX+"_SECRET_FILE", f.Name())
+				err = endefi.EncryptSecretFile(f.Name(), []byte("test"))
+				gomega.Expect(err).To(gomega.BeNil())
 			})
 		})
 	})

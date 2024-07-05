@@ -22,6 +22,19 @@ THE SOFTWARE.
 package endefi
 
 import (
+	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"crypto/sha1"
+
+	// "encoding/hex"
+	"io"
+	// "io/ioutil"
+	"os"
+
+	"golang.org/x/crypto/pbkdf2"
+
 	"github.com/bzhtux/endefi/config"
 )
 
@@ -32,4 +45,57 @@ type Secret struct {
 
 type SecretRepository interface {
 	GetSecretKey(*config.Config) (*Secret, error)
+}
+
+func EncryptSecretFile(source string, password []byte) error {
+
+	if _, err := os.Stat(source); os.IsNotExist(err) {
+		return err
+	}
+
+	// Read the file
+	plaintext, err := os.ReadFile(source)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	key := password
+	nonce := make([]byte, 12)
+
+	// Randomizing the nonce
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		panic(err.Error())
+	}
+
+	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
+
+	block, err := aes.NewCipher(dk)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	aesgcm, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
+
+	// Append the nonce to the end of file
+	ciphertext = append(ciphertext, nonce...)
+
+	f, err := os.Create(source)
+	if err != nil {
+		panic(err.Error())
+	}
+	_, err = io.Copy(f, bytes.NewReader(ciphertext))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return nil
+}
+
+func DecryptSecretFile() {
+
 }
